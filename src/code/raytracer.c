@@ -1,6 +1,7 @@
 #include <stdio.h>
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
+#include "vec3.h"
 
 typedef unsigned int bool;
 
@@ -59,13 +60,16 @@ int main(int argc, char** argv)
         {
           for (int i = 0 ; i < W; i++)
             {
-              float r =(float) i / (float) W;
-              float g =(float) j / (float) H;
-              float b = .2;
+              // update to vec3.h
+              vec3 rgb = {
+                          (float) i / (float) W,
+                          (float) j / (float) H,
+                          .2
+              };
 
-              Uint8 ir = (int)(255.99 * r);
-              Uint8 ig = (int)(255.99 * g);
-              Uint8 ib = (int)(255.99 * b);
+              Uint8 ir = (int)(255.99 * rgb.x);
+              Uint8 ig = (int)(255.99 * rgb.y);
+              Uint8 ib = (int)(255.99 * rgb.z);
 
               j = (H - 1) - j; // solve the problem of put the pixels correctly
               pixels[(j * W) + i] = (0xff << 24) | (ir << 16) | (ig << 8) | ib;
