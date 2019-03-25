@@ -158,7 +158,7 @@ problema immediat és que no reconeix el compilador de MS (cl is not found o
 quelcom similar). Per tant, caldrà que trobem un manera de veure com, des
 d'Emacs podem solventar aquesta història :-/
 
-TODO  
+TODO: Cal revisar de nou la web de Muratori al respecte: [Shell Bat](https://github.com/ecxr/handmadehero/blob/master/misc/shell.bat)
 
 ## La primera imatge  ##
 

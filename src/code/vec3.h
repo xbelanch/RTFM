@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 typedef struct { float x; float y; float z;} vec3;
+typedef vec3 rgb;
 
 
 inline void log_vec3(char* id, vec3 v)
