@@ -15,16 +15,22 @@ inline void log_vec3(char* id, vec3 v)
 
 
 // give vec3 make unitary
-inline void make_unit_vec3(vec3* v)
+inline vec3  make_unit_vec3(vec3 v)
 {
-  float k = 1.0 / sqrt(
-                       v->x * v->x +
-                       v->y * v->y +
-                       v->z * v->z);
 
-  v->x *= k;
-  v->y *= k;
-  v->z *= k;
+  float k = 1.0 / sqrt(
+                       v.x * v.x +
+                       v.y * v.y +
+                       v.z * v.z);
+
+  vec3 unit = {
+
+               v.x *= k,
+               v.y *= k,
+  v.z *= k
+
+  };
+    return unit;
 }
 
 // vector add operation: v1 + v2
