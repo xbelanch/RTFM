@@ -21,11 +21,25 @@ vec3 color(const ray ray)
                    {0, 0, -1}, // center of the sphere
                    0.5 // radius of the sphere
   };
-  
-  if (hit_sphere(sphere, ray))
+
+  float hit  = hit_sphere(sphere, ray);
+  // hit the sphere, return the normal color from the hit point
+  if (hit > 0.0)
     {
-      Color red = {1, 0, 0};
-      return red;
+      vec3 pp = point_at_parameter(hit, ray);
+      vec3 pp_c = {
+                   pp.x - sphere.center.x,
+                   pp.y - sphere.center.y,
+                   pp.z - sphere.center.z
+      };
+
+      vec3 N = make_unit_vec3(substract_vec3(pp_c, sphere.center));
+      Color normals = {(N.x + 1.0),
+                       (N.y + 1.0),
+                       (N.z + 1.0)};
+      normals = mult_scalar_vec3(normals, 1.5); // the book says 1.0 but renders a blue sphere
+      
+      return normals;
     }
 
   // paint background sky
@@ -74,14 +88,40 @@ int main(int argc, char** argv)
       for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
         {
 
+          // Process keyboard input
+          // ESC : shutdown
+          // W: Camera forward
+          // S: Camera backward
+          // A: Camera left
+          // D: Camera right
           if (ev.type == SDL_KEYDOWN)
             {
               switch (ev.key.keysym.sym) {
-              case SDLK_ESCAPE:
+              case SDLK_ESCAPE: // escape the raytracer
                 printf("Exit the program\n");
                 interrupted = true;
                 break;
+                
+              case SDLK_a: // left camera movement
+                origin.x += 0.1;
+                break;
+              
+              case SDLK_d: // right camera movement
+                origin.x -= 0.1;
+                break;
+              
+              case SDLK_w: // forward camera movement
+                origin.z -= 0.1;
+                break;
+              
+              case SDLK_s: // backward camera movement
+                origin.z += 0.1;
+                break;
+              
+              
               }
+
+              
             }
 
         }

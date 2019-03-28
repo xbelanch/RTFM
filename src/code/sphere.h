@@ -8,7 +8,7 @@
 
 typedef struct { vec3 center; float radius; } Sphere;
 
-int hit_sphere(Sphere sphere, const ray r)
+float hit_sphere(Sphere sphere, const ray r)
 {
   vec3 oc = {
           r.origin.x - sphere.center.x,
@@ -20,7 +20,9 @@ int hit_sphere(Sphere sphere, const ray r)
   float b = 2.0 * dot_vec3(oc, r.direction);
   float c = dot_vec3(oc, oc) - sphere.radius * sphere.radius;
   float discriminant = b*b - 4*a*c;
-  return (discriminant > 0) ? 1 : 0;
+  return (discriminant < 0) ? -1.0 :
+    ( -b - sqrt(discriminant) ) / (2.0 * a)
+    ;
 }
 
 
