@@ -2,6 +2,7 @@
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 #include "ray.h"
+#include "sphere.h"
 
 typedef unsigned int bool;
 
@@ -15,6 +16,19 @@ typedef unsigned int bool;
 
 vec3 color(const ray ray)
 {
+  // paint sphere if there's a collision
+  Sphere sphere = {
+                   {0, 0, -1}, // center of the sphere
+                   0.5 // radius of the sphere
+  };
+  
+  if (hit_sphere(sphere, ray))
+    {
+      Color red = {1, 0, 0};
+      return red;
+    }
+
+  // paint background sky
   vec3 unit_direction = make_unit_vec3(ray.direction);
   float t = 0.5 * (unit_direction.y + 1.0);
   vec3 color = {

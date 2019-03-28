@@ -1,11 +1,13 @@
 // vec3.h
+#ifndef HVEC3
+#define HVEC3
 
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 typedef struct { float x; float y; float z;} vec3;
-typedef vec3 rgb;
+typedef vec3 Color;
 
 
 inline void log_vec3(char* id, vec3 v)
@@ -139,3 +141,5 @@ inline vec3 unit_vec3(vec3 v)
 
   return v3;
 }
+
+#endif

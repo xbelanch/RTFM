@@ -158,9 +158,30 @@ problema immediat és que no reconeix el compilador de MS (cl is not found o
 quelcom similar). Per tant, caldrà que trobem un manera de veure com, des
 d'Emacs podem solventar aquesta història :-/
 
-TODO: Cal revisar de nou la web de Muratori al respecte: [Shell Bat](https://github.com/ecxr/handmadehero/blob/master/misc/shell.bat)
+TODO: Cal revisar de nou la web de Muratori al respecte: [Shell
+Bat](https://github.com/ecxr/handmadehero/blob/master/misc/shell.bat). Després
+de veure com ho fa, trobaràs que ha fet el següent: adjuntar aquest argument
+
+    /k r:/shell.bat 
+
+en el paràmetre de executar el cmd.
+
+Dins del shell.bat trobaràs el codi que executa, per una banda, l'entorn de
+compilació i, d'altra banda, el canvi d'unitat a R:
+
+Sobre això últim, cal veure si puc fer el mateix amb el cmder (més àgil que el
+cmd). Hi ha un debat a Github: [Question: How to start cmder with a command](https://github.com/cmderdev/cmder/issues/457)
+
+En tot cas, cal pensar en saber si podem crear un make en Windows per a
+Emacs... molt interessant aquest recurs: [Visual C++ MSVC Building Tools (Emacs
+on
+Windows)](http://caiorss.github.io/Emacs-Elisp-Programming/Emacs_On_Windows.html#sec-1-7)
+on explica una configuració d'entorn perquè pugui reconèixer l'entorn de
+desenvolupament de M.V.Studio 2017
+
 
 ## La primera imatge  ##
+
 
 
 
