@@ -4,7 +4,15 @@
 #define HSPHERE
 
 
-float hit_sphere(Sphere* sphere, Ray* ray)
+typedef struct _sphere {
+  Vector center;
+  float radius;
+  struct _sphere* next;
+  float (*hit)(struct _sphere*, Ray*); // pointer to a function
+} Sphere;
+
+
+float hit_sphere(struct _sphere* sphere, Ray* ray)
 {
   double a, b, c;
   double discriminant;
@@ -28,5 +36,23 @@ float hit_sphere(Sphere* sphere, Ray* ray)
     ;
 }
 
+Sphere* sphere_new(double x, double y, double z, float radius)
+{
+  Sphere* sphere = NULL;
+
+  sphere = malloc(sizeof(Sphere));
+
+  if (sphere != NULL){
+    memset(sphere, '\0', sizeof(Sphere));
+    sphere->center.x = x;
+    sphere->center.y = y;
+    sphere->center.z = z;
+    sphere->radius = radius;
+    sphere->hit = hit_sphere;
+
+  }
+
+  return sphere;
+}
 
 #endif

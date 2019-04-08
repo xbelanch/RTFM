@@ -17,27 +17,23 @@ typedef unsigned int bool;
 #define wscale 5
 
 
-Color getColor(Ray* ray)
+Color getColor(Sphere* sphere, Ray* ray)
 {
   // paint sphere if there's a collision
-  Sphere sphere = {
-                   {0, 0, -1}, // center of the sphere
-                   0.5 // radius of the sphere
-  };
-
-  float hit  = hit_sphere(&sphere, ray);
+  float hit  = sphere->hit(sphere, ray);
+  
   // hit the sphere, return the normal color from the hit point
   if (hit > 0.0)
     {
       Vector pp = point_at_parameter(hit, ray);
       Vector pp_c = {
-                   pp.x - sphere.center.x,
-                   pp.y - sphere.center.y,
-                   pp.z - sphere.center.z
+                   pp.x - sphere->center.x,
+                   pp.y - sphere->center.y,
+                   pp.z - sphere->center.z
       };
 
       Vector U, S;
-      Vsubtract(pp_c, sphere.center, S);
+      Vsubtract(pp_c, sphere->center, S);
       Vunitary(S, U)
       Vector normals = {(U.x + 1.0),
                        (U.y + 1.0),
@@ -75,8 +71,7 @@ int main(int argc, char** argv)
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
   SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W,H);
 
-  // TODO This is another way of create a pixels of the screen as a pointer
-  // IS A INFO!
+  // NOTE This is another way of create a pixels of the screen as a pointer
   // Uint32* pixels;
   // pixels = (Uint32*) malloc(sizeof(Uint32) * W * H);
 
@@ -93,7 +88,13 @@ int main(int argc, char** argv)
                    {.0, 2.0, .0}, // vertical
                    {.0, .0, .0} // origin
   };
-  
+
+  // Create a simple sphere
+  Sphere* sphere = sphere_new(
+                              0, 0, -1, // position
+                              0.5 // radius
+                              );
+
   bool interrupted = false;
   while(!interrupted)
     {
@@ -159,7 +160,7 @@ int main(int argc, char** argv)
               };
 
               // Color color = {1.0, 0, 1.0};
-              Color color = getColor(&ray);
+              Color color = getColor(sphere, &ray);
               
               Uint8 ir = (int)(255.99 * color.r);
               Uint8 ig = (int)(255.99 * color.g);

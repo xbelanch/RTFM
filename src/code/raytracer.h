@@ -34,12 +34,6 @@ typedef struct {
   Vector origin;
 } Camera;
 
-// Define a sphere
-typedef struct _sphere {
-  Vector center;
-  float radius;
-  struct _sphere* next;
-} Sphere;
 
 // Define the Screen environment
 typedef struct {
