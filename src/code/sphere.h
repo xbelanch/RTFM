@@ -48,6 +48,7 @@ Sphere* sphere_new(double x, double y, double z, float radius)
     sphere->center.y = y;
     sphere->center.z = z;
     sphere->radius = radius;
+    sphere->next = NULL;
     sphere->hit = hit_sphere;
 
   }

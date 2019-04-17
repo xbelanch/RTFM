@@ -6,6 +6,12 @@
 // raytracer.h:
 // Data structures definitions
 
+
+typedef enum _objectType {
+                          ASphere,
+                          APlane
+} ObjectType;
+
 // Define a three-dimensional vector
 typedef struct {
   double x;

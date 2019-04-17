@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 
@@ -6,6 +10,7 @@
 #include "vector.h"
 #include "ray.h"
 #include "sphere.h"
+#include "scene.h"
 
 typedef unsigned int bool;
 
@@ -27,17 +32,17 @@ Color getColor(Sphere* sphere, Ray* ray)
     {
       Vector pp = point_at_parameter(hit, ray);
       Vector pp_c = {
-                   pp.x - sphere->center.x,
-                   pp.y - sphere->center.y,
-                   pp.z - sphere->center.z
+                     pp.x - sphere->center.x,
+                     pp.y - sphere->center.y,
+                     pp.z - sphere->center.z
       };
 
       Vector U, S;
       Vsubtract(pp_c, sphere->center, S);
       Vunitary(S, U)
-      Vector normals = {(U.x + 1.0),
-                       (U.y + 1.0),
-                       (U.z + 1.0)};
+        Vector normals = {(U.x + 1.0),
+                          (U.y + 1.0),
+                          (U.z + 1.0)};
       Vscale(normals, 1.5); // the book says 1.0 but renders a blue sphere
       Color csphere = {
                        normals.x,
@@ -52,9 +57,9 @@ Color getColor(Sphere* sphere, Ray* ray)
   Vunitary(ray->direction, unit_direction);
   double t = 0.5 * (unit_direction.y + 1.0);
   Color background = {
-            (1.0 - t) * 1.0 + t * 0.5 ,
-            (1.0 - t) * 1.0 + t * 0.7 ,
-            (1.0 - t) * 1.0 + t * 1.0
+                      (1.0 - t) * 1.0 + t * 0.5 ,
+                      (1.0 - t) * 1.0 + t * 0.7 ,
+                      (1.0 - t) * 1.0 + t * 1.0
   };
   return background;
 }
@@ -65,6 +70,12 @@ int main(int argc, char** argv)
   char* message = "Raytracer for the masses";
   printf("%s\n", message);
 
+  // NOTE this random is useless. Remove in a future
+  srand(time(NULL));
+
+  
+
+  
   // Create a basic SDL infrastructure:
   // a window, a renderer and a texture.
   SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, W*wscale,H*hscale, SDL_WINDOW_RESIZABLE);
@@ -95,6 +106,32 @@ int main(int argc, char** argv)
                               0.5 // radius
                               );
 
+  
+   
+  printf("Sphere pointer memory: %p\n", sphere);
+
+  Scene* scene = Scene_new();
+  printf("Scene pointer memory: %p\n", scene);
+
+  Scene_add_sphere(scene, sphere);
+  printf("pointer memory scene->spheres: %p, sphere: %p\n", scene->spheres, sphere);
+
+  
+    for (int i = 0; i < 10 ; i++)
+    {
+      double x = ((double) rand() / (RAND_MAX) - rand() % 5);
+      double y = ((double) rand() / (RAND_MAX) - rand() % 5);
+      double z = ((double) rand() / (RAND_MAX) - rand() % 10);
+    double radius = ((double) rand() / (RAND_MAX));
+      
+    Sphere* sphere = sphere_new(x, y, z, radius );
+    Scene_add_sphere(scene, sphere);
+      
+  }
+
+    //print scene info
+  Scene_print(scene);
+  
   bool interrupted = false;
   while(!interrupted)
     {
@@ -116,7 +153,7 @@ int main(int argc, char** argv)
                 printf("Exit the program\n");
                 interrupted = true;
                 break;
-                
+
               case SDLK_a: // left camera movement
                 camera.origin.x += 0.1;
                 break;
@@ -151,23 +188,53 @@ int main(int argc, char** argv)
               float v = (float) j / (float) H;
 
               Ray ray = {
-                       camera.origin,
-                       {
-                        camera.lower_left_corner.x + u * camera.horizontal.x + v * camera.vertical.x,
-                        camera.lower_left_corner.y + u * camera.horizontal.y + v * camera.vertical.y,
-                        camera.lower_left_corner.z + u * camera.horizontal.z + v * camera.vertical.z
-                       }
+                         camera.origin,
+                         {
+                          camera.lower_left_corner.x + u * camera.horizontal.x + v * camera.vertical.x,
+                          camera.lower_left_corner.y + u * camera.horizontal.y + v * camera.vertical.y,
+                          camera.lower_left_corner.z + u * camera.horizontal.z + v * camera.vertical.z
+                         }
               };
 
               // Color color = {1.0, 0, 1.0};
-              Color color = getColor(sphere, &ray);
-              
+              // TODO: Make this usable
+              // Trasverse the scene and calculate the color
+
+              //{
+              Color color = {1.0, 0.0, 1.0};
+              Sphere* last = scene->spheres;
+              while (scene->spheres)
+                {
+
+                  // paint sphere if there's a collision
+                  float hit  = scene->spheres->hit(scene->spheres, &ray);
+
+                  // hit the sphere, return the normal color from the hit point
+                  if (hit > 0.0) {
+
+                    color  = getColor(scene->spheres, &ray);
+                    break;
+
+                  } else {
+                    scene->spheres = scene->spheres->next;
+
+                  }
+
+                }
+              scene->spheres = last;
+
+              //scene->spheres = scene->spheres->next;
+              //}
               Uint8 ir = (int)(255.99 * color.r);
               Uint8 ig = (int)(255.99 * color.g);
               Uint8 ib = (int)(255.99 * color.b);
 
               j = (H - 1) - j; // solve the problem of put the pixels correctly
               pixels[(j * W) + i] = (0xff << 24) | (ir << 16) | (ig << 8) | ib;
+
+
+              //              Color color = getColor(sphere, &ray);
+
             }
         }
 
