@@ -3,17 +3,8 @@
 #ifndef RAYH
 #define RAYH
 
-Ray newRay(Vector origin, Vector direction)
-{
-  Ray r = {
-           origin,
-           direction
-  };
 
-  return r;
-}
-
-inline Vector point_at_parameter(float t, Ray* ray)
+Vector point_at_parameter(struct _ray* ray, double t)
 {
   Vector v =
   {
@@ -24,5 +15,23 @@ inline Vector point_at_parameter(float t, Ray* ray)
 
   return v;
 }
+
+
+
+Ray* newRay(Vector origin, Vector direction)
+{
+  Ray* ray = malloc(sizeof(Ray));
+  if (ray != NULL)
+    {
+      ray->origin = origin;
+      ray->direction = direction;
+      ray->point_at_parameter = point_at_parameter;
+
+      return ray;
+    }
+
+  return NULL;
+};
+
 
 #endif

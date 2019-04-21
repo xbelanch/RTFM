@@ -6,43 +6,22 @@
 // raytracer.h:
 // Data structures definitions
 
+#ifndef RAYTRACERH
+#define RAYTRACERH
+
+#define W 200
+#define H 100
+#define true 1
+#define false 0
+#define hscale 5
+#define wscale 5
+
+typedef unsigned int bool;
 
 typedef enum _objectType {
-                          ASphere,
-                          APlane
+                          Sphere,
+                          Plane
 } ObjectType;
 
-// Define a three-dimensional vector
-typedef struct {
-  double x;
-  double y;
-  double z;
-} Vector;
 
-// Define a RGB Color structure
-typedef struct {
-  double r;
-  double g;
-  double b;
-} Color;
-
-// Define a ray
-typedef struct {
-  Vector origin;
-  Vector direction;
-} Ray;
-
-// Define a camera
-typedef struct {
-  Vector lower_left_corner;
-  Vector horizontal;
-  Vector vertical;
-  Vector origin;
-} Camera;
-
-
-// Define the Screen environment
-typedef struct {
-  unsigned int width;
-  unsigned int height;
-} Screen;
+#endif
