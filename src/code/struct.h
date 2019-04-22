@@ -41,6 +41,45 @@ typedef struct
   Vector origin;
 } Camera;
 
+typedef struct
+{
+  double t;
+  Vector p;
+  Vector normal;
+} hit_record;
+
+typedef struct _anObject
+{
+  struct _anObject* next;
+  ObjectType type;
+
+  // function pointers for operations on objects
+  // hit -> deal with intersections between objects and rays
+  // print -> print simple info of the object
+  bool (*hit) (struct _anObject* self, Ray* ray, float t_min, float t_max, hit_record* rec);
+  void (*print) (struct _anObject* self);
+
+  // Object specific related
+  union
+  {
+    aSphere sphere;
+  } is;
+
+} Object;
+
+
+// Define a 3D scene as a linked list of objects ;)
+typedef struct _scene
+{
+  Object* objects;
+  int size;
+  void (*print) (struct _scene* self);
+  void (*add) (struct _scene* self, Object* object);
+  void (*free) (struct _scene* scene);
+
+} Scene;
+
+
 // Define the Screen environment
 typedef struct {
   unsigned int width;

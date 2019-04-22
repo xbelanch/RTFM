@@ -1,71 +1,84 @@
-#ifndef HSCENE
-#define HSCENE
-
-#include "sphere.h"
+#ifndef SCENEH
+#define SCENEH
 
 
-// This is a implementation of a simple linked list
-// By now, only support spheres... or need to say
-// a scene of spheres
+/* bool hit (Hitable_Linked_List* hitable_linked_list, Ray* r, float t_min, float t_max, hit_record* rec) */
+/* { */
+/*   hit_record temp_rec; */
+/*   bool hit_anything = false; */
+/*   double closest_so_far = t_max; */
+/*   for (int i = 0; i < hitable_linked_list->list_size; i++ ) */
+/*     { */
 
-typedef struct {
-  Sphere* spheres;
-  int count;
-} Scene;
+/*       if (hitable_linked_list->list[i]->hit(hitable_linked_list->list[i], r, t_min, closest_so_far, &temp_rec)) */
+/*         { */
+/*           hit_anything = true; */
 
-Scene* Scene_new(void)
+/*           closest_so_far = temp_rec.t; */
+/*           rec = &temp_rec; */
+/*         } */
+/*     } */
+/*   return hit_anything; */
+/* } */
+
+void addObjectToScene(Scene* self, Object* object)
 {
-  Scene* scene = malloc(sizeof(Scene));
-  scene->spheres = NULL;
-  scene->count = 0;
-
-  return scene;
-}
-
-void Scene_add_sphere(Scene* scene, Sphere* sphere)
-{
-
-  if (scene->spheres == NULL)
+  if(self->objects == NULL) // empty scene
     {
-      scene->spheres = sphere;
-      sphere->next = NULL;
+      self->objects = object;
+      object->next = NULL; // first enter points to NULL
     } else {
 
-    sphere->next = scene->spheres;
-    scene->spheres = sphere;
+    object->next = self->objects; // point to the last object added
+    self->objects = object; // update list pointing
   }
 
-  scene->count++;
-
+  self->size += 1;
 }
 
-
-void Scene_print(Scene* scene)
+void printInfo(Scene* scene)
 {
-  printf("How many spheres at the scene? %d\n", scene->count);
-
-  Sphere* last = scene->spheres;
-  int total = scene->count;
-
-  while(scene->spheres)
-
+  printf("This is a simple print info debug of the scene\n");
+  Object* objectPTR = scene->objects; // conserve the original linked list
+  while (scene->objects)
     {
-      scene->count--;
-      printf("Sphere %d with radius %f at (%f, %f, %f)\n",
-             scene->count,
-             scene->spheres->radius,
-             scene->spheres->center.x,
-             scene->spheres->center.y,
-             scene->spheres->center.z);
-      scene->spheres = scene->spheres->next;
+      scene->objects->print(scene->objects);
+      scene->objects = scene->objects->next;
     }
-
-  scene->spheres = last;
-  scene->count = total;
-
+  scene->objects = objectPTR;
 }
 
 
+void freeScene(Scene* scene)
+{
+  Object* objectPTR;
+  while(scene->objects)
+    {
+      objectPTR = scene->objects;
+      scene->objects = scene->objects->next;
+      free(objectPTR);
+    }
+  scene->objects = NULL;
+}
 
+
+Scene* newScene()
+{
+  Scene* scene = malloc(sizeof(Scene));
+
+  if (scene != NULL)
+    {
+      scene->objects = NULL;
+      scene->size = 0;
+      scene->add = addObjectToScene;
+      scene->print = printInfo;
+      scene->free = freeScene;
+      return scene;
+
+    } else {
+
+    return NULL;
+  }
+}
 
 #endif
