@@ -70,6 +70,11 @@ Scene* newScene()
     {
       scene->objects = NULL;
       scene->size = 0;
+      scene->rec = malloc(sizeof(hit_record));
+      scene->rec->t = .0;
+      scene->rec->p = (Vector) {.0, .0, .0};
+      scene->rec->normal = (Vector) {.0, .0, .0};
+      // pointer functions
       scene->add = addObjectToScene;
       scene->print = printInfo;
       scene->free = freeScene;

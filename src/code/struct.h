@@ -41,12 +41,14 @@ typedef struct
   Vector origin;
 } Camera;
 
+
 typedef struct
 {
   double t;
   Vector p;
   Vector normal;
 } hit_record;
+
 
 typedef struct _anObject
 {
@@ -73,6 +75,7 @@ typedef struct _scene
 {
   Object* objects;
   int size;
+  hit_record* rec;
   void (*print) (struct _scene* self);
   void (*add) (struct _scene* self, Object* object);
   void (*free) (struct _scene* scene);

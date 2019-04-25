@@ -6,24 +6,15 @@
 
 Vector point_at_parameter(struct _ray* ray, double t)
 {
-  Vector v =
-  {
-    ray->origin.x + (ray->direction.x * t),
-    ray->origin.y + (ray->direction.y * t),
-    ray->origin.z + (ray->direction.z * t)
-  };
-
-  return v;
+  return vectorAdd(ray->origin, vectorScale(ray->direction, t));
 }
 
-
-
-Ray* newRay(Vector origin, Vector direction)
+Ray* newRay(Vector o, Vector direction)
 {
   Ray* ray = malloc(sizeof(Ray));
   if (ray != NULL)
     {
-      ray->origin = origin;
+      ray->origin = o;
       ray->direction = direction;
       ray->point_at_parameter = point_at_parameter;
 
