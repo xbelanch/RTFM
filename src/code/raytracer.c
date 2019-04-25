@@ -144,11 +144,11 @@ int main(int argc, char** argv)
 
   // Create the ppm file
   FILE* ppm;
-  ppm = fopen("picture.ppm", "w+");
+  // ppm = fopen("picture.ppm", "w+");
   // extract from the book to generate the ppm file
   int nx = 400;
   int ny = 200;
-  fprintf(ppm, "P3\n%d %d\n255\n", nx, ny);
+  // fprintf(ppm, "P3\n%d %d\n255\n", nx, ny);
 
   Scene* scene = newScene();
   Object* sphere;
@@ -175,9 +175,82 @@ int main(int argc, char** argv)
 
 
 
-  for (int j = ny-1; j>= 0; j--)
+
+
+
+  // remove scene from memory
+  // scene->free(scene);
+
+  // close the ppm file
+  // fclose(ppm);
+  // exit(0);
+
+  // Create a basic SDL infrastructure:
+  // a window, a renderer and a texture.
+  SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, W*wscale,H*hscale, SDL_WINDOW_RESIZABLE);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+  SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W,H);
+
+  // NOTE This is another way of create a pixels of the screen as a pointer
+  // Uint32* pixels;
+  // pixels = (Uint32*) malloc(sizeof(Uint32) * W * H);
+  // also you must add this on a simple struct instead of a chaotic variables
+
+  Uint32 pixels[W * H];
+  // reset pixels
+  SDL_memset(&pixels, 0x0, W * H * sizeof(Uint32));
+  int pitch;
+
+
+  // NOTE: This is the game loop ;)
+  bool interrupted = false;
+  while(!interrupted)
     {
-      for (int i = 0; i < nx; i++)
+
+      // Process events
+      for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
+        {
+
+          // Process keyboard input
+          // ESC : shutdown
+          // W: Camera forward
+          // S: Camera backward
+          // A: Camera left
+          // D: Camera right
+          if (ev.type == SDL_KEYDOWN)
+            {
+              switch (ev.key.keysym.sym) {
+              case SDLK_ESCAPE: // escape the raytracer
+                printf("Exit the program\n");
+                interrupted = true;
+                break;
+
+              case SDLK_a: // left camera movement
+                camera->origin.x += 0.1;
+                break;
+
+              case SDLK_d: // right camera movement
+                camera->origin.x -= 0.1;
+                break;
+
+              case SDLK_w: // forward camera movement
+                camera->origin.z -= 0.1;
+                break;
+
+              case SDLK_s: // backward camera movement
+                               camera->origin.z += 0.1;
+                break;
+
+              }
+            }
+
+        }
+
+  /*     // Render a frame */
+
+   for (int j = H-1; j>= 0; j--)
+    {
+      for (int i = 0; i < W; i++)
         {
           double u = (double)(i) / (double)(nx);
           double v = (double)(j) / (double)(ny);
@@ -192,121 +265,29 @@ int main(int argc, char** argv)
           ray->point_at_parameter(ray, 2.0);
           Color col = getColor(ray, scene);
 
-          createPPM(ppm, col);
+          //createPPM(ppm, col);
+            int ir = (int)(255.99 * col.r);
+  int ig = (int)(255.99 * col.g);
+  int ib = (int)(255.99 * col.b);
+
+              j = (H - 1) - j; // solve the problem of put the pixels correctly
+              pixels[(j * W) + i] = (0xff << 24) | (ir << 16) | (ig << 8) | ib;
+
 
         }
     }
 
+      // pitch = four bytes: (Alpha | Red | Green | Blue ) * Row
+      SDL_UpdateTexture(texture, NULL, pixels, W*4);
+      SDL_RenderCopy(renderer, texture, NULL, NULL);
+      SDL_RenderPresent(renderer);
 
-  // remove scene from memory
-  scene->free(scene);
+      // Basic delay
+      SDL_Delay(1000/60);
 
-  // close the ppm file
-  fclose(ppm);
-  exit(0);
+    }
 
-  /* // Create a basic SDL infrastructure: */
-  /* // a window, a renderer and a texture. */
-  /* SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, W*wscale,H*hscale, SDL_WINDOW_RESIZABLE); */
-  /* SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0); */
-  /* SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W,H); */
-
-  /* // NOTE This is another way of create a pixels of the screen as a pointer */
-  /* // Uint32* pixels; */
-  /* // pixels = (Uint32*) malloc(sizeof(Uint32) * W * H); */
-  /* // also you must add this on a simple struct instead of a chaotic variables  */
-
-  /* Uint32 pixels[W * H]; */
-  /* // reset pixels */
-  /* SDL_memset(&pixels, 0x0, H * W * sizeof(Uint32)); */
-  /* int pitch; */
-
-
-  /* // NOTE: This is the game loop ;) */
-  /* bool interrupted = false; */
-  /* while(!interrupted) */
-  /*   { */
-
-  /*     // Process events */
-  /*     for(SDL_Event ev; SDL_PollEvent(&ev) != 0; ) */
-  /*       { */
-
-  /*         // Process keyboard input */
-  /*         // ESC : shutdown */
-  /*         // W: Camera forward */
-  /*         // S: Camera backward */
-  /*         // A: Camera left */
-  /*         // D: Camera right */
-  /*         if (ev.type == SDL_KEYDOWN) */
-  /*           { */
-  /*             switch (ev.key.keysym.sym) { */
-  /*             case SDLK_ESCAPE: // escape the raytracer */
-  /*               printf("Exit the program\n"); */
-  /*               interrupted = true; */
-  /*               break; */
-
-  /*             case SDLK_a: // left camera movement */
-  /*               camera.origin.x += 0.1; */
-  /*               break; */
-
-  /*             case SDLK_d: // right camera movement */
-  /*               camera.origin.x -= 0.1; */
-  /*               break; */
-
-  /*             case SDLK_w: // forward camera movement */
-  /*               camera.origin.z -= 0.1; */
-  /*               break; */
-
-  /*             case SDLK_s: // backward camera movement */
-  /*                              camera.origin.z += 0.1; */
-  /*               break; */
-
-  /*             } */
-  /*           } */
-
-  /*       } */
-
-  /*     // Render a frame */
-  /*     for (int j = H - 1; j >= 0; j--) */
-  /*       { */
-  /*         for (int i = 0 ; i < W; i++) */
-  /*           { */
-  /*             // UV screen */
-  /*             float u = (float) i / (float) W; */
-  /*             float v = (float) j / (float) H; */
-
-  /*             Vector direction =  { */
-  /*                         camera.lower_left_corner.x + u * camera.horizontal.x + v * camera.vertical.x, */
-  /*                         camera.lower_left_corner.y + u * camera.horizontal.y + v * camera.vertical.y, */
-  /*                         camera.lower_left_corner.z + u * camera.horizontal.z + v * camera.vertical.z */
-  /*             }; */
-  /*             Ray* ray = newRay( camera.origin, direction                                 ); */
-
-  /*             //              Vector p = ray->point_at_parameter(ray, 1.0); // interesting to see how it change the pattern if you add more value */
-  /*             ray->point_at_parameter(ray, 2.0); // the book says 2.0 :?  */
-  /*            Color color = getColor(ray, world); */
-  /*             Uint8 ir = (int)(255.99 * color.r); */
-  /*             Uint8 ig = (int)(255.99 * color.g); */
-  /*             Uint8 ib = (int)(255.99 * color.b); */
-
-  /*             j = (H - 1) - j; // solve the problem of put the pixels correctly */
-  /*             pixels[(j * W) + i] = (0xff << 24) | (ir << 16) | (ig << 8) | ib; */
-
-
-  /*           } */
-  /*       } */
-
-  /*     // pitch = four bytes: (Alpha | Red | Green | Blue ) * Row */
-  /*     SDL_UpdateTexture(texture, NULL, pixels, W*4); */
-  /*     SDL_RenderCopy(renderer, texture, NULL, NULL); */
-  /*     SDL_RenderPresent(renderer); */
-
-  /*     // Basic delay */
-  /*     SDL_Delay(1000/60); */
-
-  /*   } */
-
-  /* SDL_DestroyTexture(texture); */
-  /* SDL_Quit(); */
+  SDL_DestroyTexture(texture);
+  SDL_Quit();
   return 0;
 }
