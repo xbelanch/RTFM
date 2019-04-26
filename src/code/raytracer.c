@@ -15,96 +15,21 @@
 #include "sphere.h"
 
 
-// NOTE: this is the old getColor Function. Needs to fit with the new hitable code
-/* Color getColor(Sphere* sphere, Ray* ray) */
-/* { */
-/*   // paint sphere if there's a collision */
-/*   float hit  = sphere->hit(sphere, ray); */
-
-/*   // hit the sphere, return the normal color from the hit point */
-/*   if (hit > 0.0) */
-/*     { */
-/*       Vector pp = point_at_parameter(hit, ray); */
-/*       Vector pp_c = { */
-/*                      pp.x - sphere->center.x, */
-/*                      pp.y - sphere->center.y, */
-/*                      pp.z - sphere->center.z */
-/*       }; */
-
-/*       Vector U, S; */
-/*       Vsubtract(pp_c, sphere->center, S); */
-/*       Vunitary(S, U) */
-/*         Vector normals = {(U.x + 1.0), */
-/*                           (U.y + 1.0), */
-/*                           (U.z + 1.0)}; */
-/*       Vscale(normals, 1.5); // the book says 1.0 but renders a blue sphere */
-/*       Color csphere = { */
-/*                        normals.x, */
-/*                        normals.y, */
-/*                        normals.z */
-/*       }; */
-/*       return csphere; */
-/*     } */
-
-/*   // paint background sky */
-/*   Vector unit_direction; */
-/*   Vunitary(ray->direction, unit_direction); */
-/*   double t = 0.5 * (unit_direction.y + 1.0); */
-/*   Color background = { */
-/*                       (1.0 - t) * 1.0 + t * 0.5 , */
-/*                       (1.0 - t) * 1.0 + t * 0.7 , */
-/*                       (1.0 - t) * 1.0 + t * 1.0 */
-/*   }; */
-/*   return background; */
-/* } */
-
-
-// NOTE: This is the second version of getColor (chapter 5)
-// It's the "same" code of the book (or very similar), but it's
-// not working properly.
-
-/* Color getColor(Ray* ray, Hitable_Linked_List* world) */
-/* { */
-/*   hit_record rec; */
-/*   if (world->hit(world, ray, 0.0, 100.0, &rec)) */
-/*     { */
-
-/*       Vector color_normals =  { */
-/*                                (rec.normal.x + 1.0), */
-/*                                (rec.normal.y + 1.0), */
-/*                                (rec.normal.z + 1.0)}; */
-/*       Vscale(color_normals, .5); */
-/*       Color c = { */
-/*                  color_normals.x, */
-/*                  color_normals.y, */
-/*                  color_normals.z */
-/*       }; */
-/*       return c; */
-/*     } else { */
-/*     // paint background sky */
-/*     Vector unit_direction; */
-/*     Vunitary(ray->direction, unit_direction); */
-/*     double t = 0.5 * (unit_direction.y + 1.0); */
-/*     Color background = { */
-/*                         (1.0 - t) * 1.0 + t * 0.5 , */
-/*                         (1.0 - t) * 1.0 + t * 0.7 , */
-/*                         (1.0 - t) * 1.0 + t * 1.0 */
-/*     }; */
-/*     return background; */
-/*   } */
-/* } */
-
+//
 Color getColor(Ray* ray, Scene* scene)
 {
   Object* pt = scene->objects;
   Object* object;
   bool hit_anything = false;
+  double t_min = 0.0;
+  double closest_so_far = 1000.0;
   while(scene->objects)
     {
       object = scene->objects;
-      if (object->hit(object, ray, 0.0, 1000.0, scene->rec))
+      if (object->hit(object, ray, t_min, closest_so_far, scene->rec))
         {
           hit_anything = true;
+          closest_so_far = scene->rec->t;
         }
       scene->objects = object->next;
     }
@@ -113,6 +38,7 @@ Color getColor(Ray* ray, Scene* scene)
 
   if (hit_anything)
     {
+      // return color of the object intersected by ray
       Vector col = newVector(scene->rec->normal.x + 1,
                              scene->rec->normal.y + 1,
                              scene->rec->normal.z + 1);
@@ -120,7 +46,7 @@ Color getColor(Ray* ray, Scene* scene)
       return (Color) {col.x, col.y, col.z};
 
     } else {
-    // paint background
+    // else paint background
     Vector unit_direction = vectorUnitary(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
     return (Color) { (1.0 - t) * 1.0 + t * 0.5 , (1.0 - t) * 1.0 + t * 0.7 ,  (1.0 - t) * 1.0 + t * 1.0  };
@@ -143,25 +69,22 @@ int main(int argc, char** argv)
   printf("%s\n", message);
 
   // Create the ppm file
-  FILE* ppm;
+  // FILE* ppm;
   // ppm = fopen("picture.ppm", "w+");
-  // extract from the book to generate the ppm file
-  int nx = 400;
-  int ny = 200;
   // fprintf(ppm, "P3\n%d %d\n255\n", nx, ny);
 
   Scene* scene = newScene();
   Object* sphere;
 
+  sphere = newSphere( location(.0, -100.5, -1), 100 );
+  scene->add(scene, sphere);
+
+  sphere = newSphere( location(.25, .25, .0), .25 );
+  scene->add(scene, sphere);
+
   sphere = newSphere( location(.0, .0, -1.0), .5 );
   scene->add(scene, sphere);
 
-  sphere = newSphere( location(.0, -100.5, -1), 100 );
-  scene->add(scene, sphere);
-  /*
-  sphere = newSphere( location(.0, .20, -1.0), .5 );
-  scene->add(scene, sphere);
-  */
 
   scene->print(scene);
 
@@ -172,18 +95,6 @@ int main(int argc, char** argv)
                              cam_origin(.0, .0, .0)
                              );
 
-
-
-
-
-
-
-  // remove scene from memory
-  // scene->free(scene);
-
-  // close the ppm file
-  // fclose(ppm);
-  // exit(0);
 
   // Create a basic SDL infrastructure:
   // a window, a renderer and a texture.
@@ -252,8 +163,8 @@ int main(int argc, char** argv)
     {
       for (int i = 0; i < W; i++)
         {
-          double u = (double)(i) / (double)(nx);
-          double v = (double)(j) / (double)(ny);
+          double u = (double)(i) / (double)(W);
+          double v = (double)(j) / (double)(H);
           // ray = origin, lower_left_corner + u*horizontal + v*vertical
           Ray* ray = newRay(camera->origin,
                             vectorAdd(
@@ -289,5 +200,12 @@ int main(int argc, char** argv)
 
   SDL_DestroyTexture(texture);
   SDL_Quit();
+  // remove scene from memory
+
+  scene->free(scene);
+
+  // close the ppm file
+  // fclose(ppm);
+
   return 0;
 }
