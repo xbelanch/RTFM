@@ -15,6 +15,7 @@
 #define false 0
 #define hscale 2
 #define wscale 2
+#define samples 100
 
 typedef unsigned int bool;
 
