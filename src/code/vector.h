@@ -23,10 +23,6 @@ Vector newVector(double x, double y, double z)
 // instead of newVector(a, b, c) better say location(a, b, c)
 //
 #define location newVector
-#define cam_lower_left_corner newVector
-#define cam_horizontal newVector
-#define cam_vertical newVector
-#define cam_origin newVector
 
 // add two vectors c = a + b
 inline Vector vectorAdd (Vector a, Vector b)
@@ -95,12 +91,12 @@ inline Vector vectorScale(Vector a, double k)
 }
 
 // Vector length of a
-inline float vectorLength(Vector a) {
+inline double vectorLength(Vector a) {
   return sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
 }
 
 // Vector squared length of a
-inline float vectorSquaredLength(Vector a) {
+inline double vectorSquaredLength(Vector a) {
   return a.x * a.x + a.y * a.y + a.z * a.z;
 }
 

@@ -9,13 +9,13 @@
 #ifndef RAYTRACERH
 #define RAYTRACERH
 
-#define W 400
-#define H 200
+#define W 800
+#define H 400
 #define true 1
 #define false 0
 #define hscale 2
 #define wscale 2
-#define samples 100
+#define samples 256
 
 typedef unsigned int bool;
 

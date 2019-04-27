@@ -33,12 +33,13 @@ typedef struct
 } aSphere;
 
 // Define a camera
-typedef struct
+typedef struct _camera
 {
   Vector lower_left_corner;
   Vector horizontal;
   Vector vertical;
   Vector origin;
+  Ray* (*get_ray) (struct _camera* camera, double u, double v);
 } Camera;
 
 
