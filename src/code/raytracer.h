@@ -15,7 +15,9 @@
 #define false 0
 #define hscale 2
 #define wscale 2
-#define samples 256
+#define samples 2
+
+
 
 typedef unsigned int bool;
 
@@ -24,5 +26,7 @@ typedef enum _objectType {
                           Plane
 } ObjectType;
 
+// this is a shit, but maybe now works
+double drand48();
 
 #endif

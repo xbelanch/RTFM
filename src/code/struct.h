@@ -22,7 +22,6 @@ typedef struct _ray
 {
   Vector origin;
   Vector direction;
-  Vector (*point_at_parameter) (struct _ray* ray, double t);
 } Ray;
 
 // Objects
@@ -43,11 +42,21 @@ typedef struct _camera
 } Camera;
 
 
-typedef struct
+typedef struct _material
+{
+  Color albedo;
+  double fuzz;
+  bool (*scatter) (Ray* ray_in, Ray* scattered, struct _material* self, struct _hit_record rec, Color* attenuation);
+} Material;
+
+typedef struct _hit_record
 {
   double t;
   Vector p;
   Vector normal;
+  Material* material;
+
+
 } hit_record;
 
 
@@ -55,11 +64,13 @@ typedef struct _anObject
 {
   struct _anObject* next;
   ObjectType type;
+  Material* material;
 
   // function pointers for operations on objects
   // hit -> deal with intersections between objects and rays
   // print -> print simple info of the object
   bool (*hit) (struct _anObject* self, Ray* ray, float t_min, float t_max, hit_record* rec);
+
   void (*print) (struct _anObject* self);
 
   // Object specific related
@@ -76,11 +87,10 @@ typedef struct _scene
 {
   Object* objects;
   int size;
-  hit_record* rec;
   void (*print) (struct _scene* self);
   void (*add) (struct _scene* self, Object* object);
-  void (*free) (struct _scene* scene);
-
+  void (*free) (struct _scene* self);
+  bool (*hitable) (struct _scene* self, Ray* ray, double t_min, double t_max, hit_record* rec);
 } Scene;
 
 

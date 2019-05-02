@@ -27,7 +27,7 @@ bool hitSphere(Object* self, Ray* ray, float t_min, float t_max, hit_record* rec
       if (temp < t_max && temp > t_min)
         {
           rec->t = temp;
-          rec->p = ray->point_at_parameter(ray, rec->t);
+          rec->p = point_at_parameter(ray, rec->t);
           rec->normal = vectorDivide(vectorSubtract(rec->p, self->is.sphere.center), self->is.sphere.radius);
           return true;
         }
@@ -35,7 +35,7 @@ bool hitSphere(Object* self, Ray* ray, float t_min, float t_max, hit_record* rec
       if (temp < t_max && temp > t_min)
         {
           rec->t = temp;
-          rec->p = ray->point_at_parameter(ray, rec->t);
+          rec->p = point_at_parameter(ray, rec->t);
           rec->normal = vectorDivide(vectorSubtract(rec->p, self->is.sphere.center), self->is.sphere.radius);
           return true;
         };

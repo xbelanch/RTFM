@@ -12,6 +12,7 @@
 #include "vector.h"
 #include "ray.h"
 #include "camera.h"
+#include "material.h"
 #include "sphere.h"
 
 // https://docs.microsoft.com/en-us/previous-versions/sxtz2fa8(v=vs.140)
@@ -23,56 +24,32 @@ double drand48()
   return rand() / (RAND_MAX + 1.0);
 }
 
-Vector random_in_unit_sphere()
-{
-  Vector p;
-  do {
-    p = vectorScale(
-                    vectorSubtract(
-                                   newVector(drand48(), drand48(), drand48()),
-                                   newVector(1.0, 1.0, 1.0)
-                                   ),
-                    2.0);
-  } while (vectorSquaredLength(p) >= 1.0);
-  return p;
-}
 
-//
-Color getColor(Ray* ray, Scene* scene)
+// The main tracer recursive function
+Color getColor(Ray* ray, Scene* scene, int depth)
 {
-  Object* pt = scene->objects;
-  Object* object;
-  bool hit_anything = false;
-  double t_min = 0.00001; // min distance
-  double closest_so_far = 1000.0; // max distance
-  while(scene->objects)
+  hit_record rec;
+  if (scene->hitable(scene, ray, 0.001, 1000.0, &rec))
     {
-      object = scene->objects;
-      if (object->hit(object, ray, t_min, closest_so_far, scene->rec))
+
+      Color attenuation = {0.35, 0.35, 0.35};
+      Ray scattered;
+
+
+      if (depth < 50 && rec.material->scatter(ray, &scattered, rec.material, rec, &attenuation))
         {
-          hit_anything = true;
-          closest_so_far = scene->rec->t;
-        }
-      scene->objects = object->next;
-    }
+          Color col = getColor(&scattered, scene, depth + 1);
 
-  scene->objects = pt;
-
-  if (hit_anything)
-    {
-
-      // diffuse material
-      Vector _v = vectorAdd(scene->rec->p, scene->rec->normal);
-      Vector target = vectorAdd(_v, random_in_unit_sphere());
-      Ray* ray = newRay(scene->rec->p,
-                        vectorSubtract(target, scene->rec->p)
-                        );
-
-      // Recursive!
-      Color col = getColor(ray, scene);
-      return (Color) {col.r * 0.5, col.g * 0.5, col.b * 0.5};
-
+          return (Color) {
+            col.r * attenuation.r,
+              col.g * attenuation.g,
+              col.b * attenuation.b
+              };
+        } else {
+        return (Color) {0.0, 0.0, 0.0};
+      }
     } else {
+
     // else paint background
     Vector unit_direction = vectorUnitary(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
@@ -81,19 +58,19 @@ Color getColor(Ray* ray, Scene* scene)
 
 }
 
-void createPPM(FILE* file, Color col)
+void createPPM(FILE* file, int r, int g, int b)
 {
-  int ir = (int)(255.99 * col.r);
-  int ig = (int)(255.99 * col.g);
-  int ib = (int)(255.99 * col.b);
-
-  fprintf(file, "%d %d %d\n", ir, ig, ib);
+  fprintf(file, "%d %d %d\n", r, g, b);
 }
+
+
 
 int main(int argc, char** argv)
 {
   char* message = "Raytracer for the masses";
   printf("%s\n", message);
+
+
 
 
   // Rand stuff
@@ -109,17 +86,28 @@ int main(int argc, char** argv)
   Scene* scene = newScene();
   Object* sphere;
 
+
+  sphere = newSphere( location(.0, .0, -1), .5 );
+  sphere->material = Lambertian((Color) {0.8, 0.3, 0.3});
+  scene->add(scene, sphere);
+
   sphere = newSphere( location(.0, -100.5, -1.0), 100 );
+  sphere->material = Lambertian((Color) {0.8, .8, .0});
   scene->add(scene, sphere);
 
-  sphere = newSphere( location(.15, -0.25, -0.65), .15 );
+  sphere = newSphere( location(1, 0, -1.0), .5 );
+  sphere->material = Metal((Color) {.8, .6, .2}, 0.3);
   scene->add(scene, sphere);
 
-  sphere = newSphere( location(.0, .0, -1.35), .5 );
+  sphere = newSphere( location(-1, 0, -1.0), .5 );
+  sphere->material = Metal((Color) {.8, .8, .8}, 0.95);
   scene->add(scene, sphere);
 
-  sphere = newSphere( location(-0.85, -0.25, -1.0), .25 );
+
+  sphere = newSphere( location(0, 0.85, -1.0), .35 );
+  sphere->material = Lambertian((Color) {0.2, 0.2, .65});
   scene->add(scene, sphere);
+
 
 
   scene->print(scene);
@@ -129,121 +117,146 @@ int main(int argc, char** argv)
 
   // Create a basic SDL infrastructure:
   // a window, a renderer and a texture.
-  /* SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, W*wscale,H*hscale, SDL_WINDOW_RESIZABLE); */
-  /* SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0); */
-  /* SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W,H); */
+  SDL_Window* window = SDL_CreateWindow(argv[1], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, W ,H , SDL_WINDOW_RESIZABLE);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+  SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W,H);
 
   // NOTE This is another way of create a pixels of the screen as a pointer
   // Uint32* pixels;
   // pixels = (Uint32*) malloc(sizeof(Uint32) * W * H);
   // also you must add this on a simple struct instead of a chaotic variables
 
-  /* Uint32 pixels[W * H]; */
+  Uint32* pixels;
+  pixels = (Uint32*) malloc(sizeof(Uint32) * W * H);
+  int pitch;
+
   // reset pixels
   /* SDL_memset(&pixels, 0x0, W * H * sizeof(Uint32)); */
   /* int pitch; */
 
 
   // NOTE: This is the game SDL loop ;)
-  /* bool interrupted = false; */
-  /* while(!interrupted) */
-  /*   { */
-
-  /*     // Process events */
-  /*     for(SDL_Event ev; SDL_PollEvent(&ev) != 0; ) */
-  /*       { */
-
-  /*         // Process keyboard input */
-  /*         // ESC : shutdown */
-  /*         // W: Camera forward */
-  /*         // S: Camera backward */
-  /*         // A: Camera left */
-  /*         // D: Camera right */
-  /*         if (ev.type == SDL_KEYDOWN) */
-  /*           { */
-  /*             switch (ev.key.keysym.sym) { */
-  /*             case SDLK_ESCAPE: // escape the raytracer */
-  /*               printf("Exit the program\n"); */
-  /*               interrupted = true; */
-  /*               break; */
-
-  /*             case SDLK_a: // left camera movement */
-  /*               camera->origin.x += 0.1; */
-  /*               break; */
-
-  /*             case SDLK_d: // right camera movement */
-  /*               camera->origin.x -= 0.1; */
-  /*               break; */
-
-  /*             case SDLK_w: // forward camera movement */
-  /*               camera->origin.z -= 0.1; */
-  /*               break; */
-
-  /*             case SDLK_s: // backward camera movement */
-  /*                              camera->origin.z += 0.1; */
-  /*               break; */
-
-  /*             } */
-  /*           } */
-
-  /*       } */
-
-  /*     // Render a frame */
-
-  for (int j = H-1; j>= 0; j--)
+  bool interrupted = false;
+  while(!interrupted)
     {
-      for (int i = 0; i < W; i++)
+
+
+
+      // Render a frame
+
+      for (int j = H-1; j>= 0; j--)
         {
-
-          Color col = {0.0, 0.0, 0.0};
-
-          // Antialiasing
-          for (int s = 0; s < samples; s++)
+          if (interrupted) break;
+          for (int i = 0; i < W; i++)
             {
 
-              double u = (double)(i + drand48()) / (double)(W);
-              double v = (double)(j + drand48()) / (double)(H);
+              Color col = {0.0, 0.0, 0.0};
 
-              Ray* ray = camera->get_ray(camera, u, v);
+              // Antialiasing
+              for (int s = 0; s < samples; s++)
+                {
 
-              ray->point_at_parameter(ray, 2.0);
+                  double u = (double)(i + drand48()) / (double)(W);
+                  double v = (double)(j + drand48()) / (double)(H);
 
-              Color t = getColor(ray, scene);
-              col.r += t.r;
-              col.g += t.g;
-              col.b += t.b;
+                  Ray* ray = camera->get_ray(camera, u, v);
+
+                  point_at_parameter(ray, 2.0);
+
+                  int depth = 16;
+                  Color t = getColor(ray, scene, depth);
+                  col.r += t.r;
+                  col.g += t.g;
+                  col.b += t.b;
+
+                }
+
+              col.r /= (double)(samples);
+              col.g /= (double)(samples);
+              col.b /= (double)(samples);
+
+              // using a "gamma 2" which means raising the color to the power 1/gamma, or
+              // in our simple case 1/2 which is just squared-root
+              col.r = sqrt(col.r);
+              col.g = sqrt(col.g);
+              col.b = sqrt(col.b);
+
+              int ir = (int)(255.99 * col.r);
+              int ig = (int)(255.99 * col.g);
+              int ib = (int)(255.99 * col.b);
+
+              // save color to ppm file
+              createPPM(ppm, ir, ig, ib);
+
+
+              // Update SDL window for every line
+              // Process events
+              for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
+                {
+
+                  // Process keyboard input
+                  // ESC : shutdown
+                  if (ev.type == SDL_KEYDOWN)
+                    {
+                      switch (ev.key.keysym.sym) {
+                      case SDLK_ESCAPE: // escape the raytracer
+                        printf("Stop the render process\n");
+                        interrupted = true;
+                        break;
+
+                      }
+                    }
+
+                }
+
+              int _j = (H - 1) - j; // solve the problem of put the pixels correctly
+              pixels[(_j * W) + i] = 0xff << 24 | ir  << 16 | ig << 8 | ib;
+
+              if (((_j * W) + i) % W == 0)
+                {
+                  // pitch = four bytes: (Alpha | Red | Green | Blue ) * Row
+                  SDL_UpdateTexture(texture, NULL, pixels, W*4);
+                  SDL_RenderCopy(renderer, texture, NULL, NULL);
+                  SDL_RenderPresent(renderer);
+
+                }
 
             }
-
-          col.r /= (float)(samples);
-          col.g /= (float)(samples);
-          col.b /= (float)(samples);
-          createPPM(ppm, col);
-
-          // SDL Stuff
-          /* int ir = (int)(255.99 * col.r); */
-          /* int ig = (int)(255.99 * col.g); */
-          /* int ib = (int)(255.99 * col.b); */
-
-          /* j = (H - 1) - j; // solve the problem of put the pixels correctly */
-          /* pixels[(j * W) + i] = (0xff << 24) | (ir << 16) | (ig << 8) | ib; */
-
-
         }
+      // update last line of screen
+      SDL_UpdateTexture(texture, NULL, pixels, W*4);
+                  SDL_RenderCopy(renderer, texture, NULL, NULL);
+                  SDL_RenderPresent(renderer);
+      interrupted = true;
     }
 
-  // pitch = four bytes: (Alpha | Red | Green | Blue ) * Row
-  /* SDL_UpdateTexture(texture, NULL, pixels, W*4); */
-  /* SDL_RenderCopy(renderer, texture, NULL, NULL); */
-  /* SDL_RenderPresent(renderer); */
 
-  /* // Basic delay */
-  /* SDL_Delay(1000/60); */
 
-  //}
+  bool exit  = false;
+  while(!exit)
+    {
+              for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
+                {
 
-  /* SDL_DestroyTexture(texture); */
-  /* SDL_Quit(); */
+                  // Process keyboard input
+                  // ESC : shutdown
+                  if (ev.type == SDL_KEYDOWN)
+                    {
+                      switch (ev.key.keysym.sym) {
+                      case SDLK_ESCAPE: // escape the raytracer
+                        printf("Exit the program\n");
+                        exit = true;
+                        break;
+
+                      }
+                    }
+
+                }
+
+
+    }
+  SDL_DestroyTexture(texture);
+  SDL_Quit();
 
   // remove scene from memory
   scene->free(scene);
