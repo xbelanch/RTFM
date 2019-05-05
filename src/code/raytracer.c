@@ -64,6 +64,65 @@ void createPPM(FILE* file, int r, int g, int b)
 }
 
 
+Scene* random_scene()
+{
+  Scene* scene = newScene();
+  Object* sphere;
+
+  int n = 500;
+
+  sphere = newSphere( location(.0, -1000.0, 0), 1000 );
+  sphere->material = Lambertian((Color) {0.5, 0.5, 0.5});
+  scene->add(scene, sphere);
+
+  int i = 1;
+  for (int a = -11; a < 11; a++)
+    {
+      for (int b = -11; b < 11; b++)
+        {
+          double choose_mat = drand48();
+          Vector center = {a+0.9*drand48(), 0.2, b+0.9*drand48()};
+          if (vectorLength(vectorSubtract(center, (Vector){4, 0.2, 0})) > .9)
+            {
+              if (choose_mat < 0.7) // diffuse
+                {
+                  sphere = newSphere(center, .2);
+                  sphere->material = Lambertian((Color) {drand48()*drand48() , drand48()*drand48(), drand48()*drand48()});
+                  scene->add(scene, sphere);
+                }
+              else if (choose_mat < 0.85) // metal
+                {
+                  sphere = newSphere(center, .2);
+                  sphere->material = Metal((Color) {0.5 * (1 * drand48()), 0.5 * (1 * drand48()), 0.5 * (1 * drand48())}, 0.5 * drand48());
+                  scene->add(scene, sphere);
+
+                }
+              else // glass
+                {
+                  sphere = newSphere(center, .2);
+                  sphere->material = Dielectric(1.5);
+                  scene->add(scene, sphere);
+                }
+            }
+        }
+    }
+
+  // three big spheres
+  sphere = newSphere((Vector) {-4, 1, 0}, 1.0);
+  sphere->material = Lambertian((Color) {.4, 0.2, 0.1});
+  scene->add(scene, sphere);
+
+  sphere = newSphere((Vector) {4, 1, 0}, 1.0);
+  sphere->material = Metal((Color) {.7, 0.6, 0.5}, 0.0);
+  scene->add(scene, sphere);
+
+  sphere = newSphere((Vector) {0, 1, 0}, 1.0);
+  sphere->material = Dielectric(1.5);
+  scene->add(scene, sphere);
+
+  return scene;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -83,44 +142,18 @@ int main(int argc, char** argv)
   ppm = fopen("picture.ppm", "w+");
   fprintf(ppm, "P3\n%d %d\n255\n", W, H);
 
-  Scene* scene = newScene();
-  Object* sphere;
 
-
-  sphere = newSphere( location(.0, .0, -1), .5 );
-  sphere->material = Lambertian((Color) {0.1, 0.2, 0.4});
-  scene->add(scene, sphere);
-
-  sphere = newSphere( location(.0, -100.5, -1.0), 100 );
-  sphere->material = Lambertian((Color) {0.8, .8, .0});
-  scene->add(scene, sphere);
-
-  sphere = newSphere( location(1, 0, -1.0), .5 );
-  sphere->material = Metal((Color) {.8, .6, .2}, 0.0);
-  scene->add(scene, sphere);
-
-  sphere = newSphere( location(-1, 0, -1.0), 0.5 );
-  sphere->material = Dielectric(1.5);
-  scene->add(scene, sphere);
-
-    sphere = newSphere( location(-1, 0, -1.0), -0.45 );
-  sphere->material = Dielectric(1.5);
-  scene->add(scene, sphere);
-
-  sphere = newSphere( location(0, 0.85, -1.0), .35 );
-  sphere->material = Lambertian((Color) {0.2, 0.2, .65});
-  scene->add(scene, sphere);
-
-
-
+  // Setup a new scene with a lot of random spheres
+  Scene* scene = random_scene();
   scene->print(scene);
 
-  Vector lookFrom = {-2, 2, 1};
-  Vector lookAt = {0, 0, -1};
+  // Camera
+  Vector lookFrom = {12, 1.75, 2};
+  Vector lookAt = {0, 0.3, 1};
   Vector Up = {0, 1, 0};
   double fov = 20;
   double aspect = (double)(W) / (double)(H);
-  double aperture = 2.0;
+  double aperture = 1.0;
   double dist_to_focus = vectorLength(vectorSubtract(lookFrom, lookAt));
 
   Camera* camera = newCamera(lookFrom, lookAt, Up, fov, aspect, aperture, dist_to_focus);
@@ -236,8 +269,8 @@ int main(int argc, char** argv)
         }
       // update last line of screen
       SDL_UpdateTexture(texture, NULL, pixels, W*4);
-                  SDL_RenderCopy(renderer, texture, NULL, NULL);
-                  SDL_RenderPresent(renderer);
+      SDL_RenderCopy(renderer, texture, NULL, NULL);
+      SDL_RenderPresent(renderer);
       interrupted = true;
     }
 
@@ -246,23 +279,23 @@ int main(int argc, char** argv)
   bool exit  = false;
   while(!exit)
     {
-              for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
-                {
+      for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
+        {
 
-                  // Process keyboard input
-                  // ESC : shutdown
-                  if (ev.type == SDL_KEYDOWN)
-                    {
-                      switch (ev.key.keysym.sym) {
-                      case SDLK_ESCAPE: // escape the raytracer
-                        printf("Exit the program\n");
-                        exit = true;
-                        break;
+          // Process keyboard input
+          // ESC : shutdown
+          if (ev.type == SDL_KEYDOWN)
+            {
+              switch (ev.key.keysym.sym) {
+              case SDLK_ESCAPE: // escape the raytracer
+                printf("Exit the program\n");
+                exit = true;
+                break;
 
-                      }
-                    }
+              }
+            }
 
-                }
+        }
 
 
     }

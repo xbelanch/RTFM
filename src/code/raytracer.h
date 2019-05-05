@@ -9,13 +9,11 @@
 #ifndef RAYTRACERH
 #define RAYTRACERH
 
-#define W 800
-#define H 400
+#define W 1024
+#define H 768
 #define true 1
 #define false 0
-#define hscale 2
-#define wscale 2
-#define samples 8
+#define samples 100
 
 
 
