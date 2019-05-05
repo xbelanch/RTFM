@@ -107,15 +107,20 @@ int main(int argc, char** argv)
   sphere->material = Dielectric(1.5);
   scene->add(scene, sphere);
 
-  /* sphere = newSphere( location(0, 0.85, -1.0), .35 ); */
-  /* sphere->material = Lambertian((Color) {0.2, 0.2, .65}); */
-  /* scene->add(scene, sphere); */
+  sphere = newSphere( location(0, 0.85, -1.0), .35 );
+  sphere->material = Lambertian((Color) {0.2, 0.2, .65});
+  scene->add(scene, sphere);
 
 
 
   scene->print(scene);
 
-  Camera* camera = newCamera();
+  Vector lookFrom = {-2, 2, 1};
+  Vector lookAt = {0, 0, -1};
+  Vector Up = {0, 1, 0};
+  double fov = 30;
+  double aspect = (double)(W) / (double)(H);
+  Camera* camera = newCamera(lookFrom, lookAt, Up, fov, aspect);
 
 
   // Create a basic SDL infrastructure:
