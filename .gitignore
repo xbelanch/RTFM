@@ -6,6 +6,8 @@
 
 src/build/
 
+## Avoid ppm files! 
+*.ppm
 
 ### C ###
 # Prerequisites

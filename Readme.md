@@ -87,6 +87,10 @@ Un cop fet, cal executar la següent instrucció:
 
     devenv.exe ..\build\ray.exe
 
+No acaba de funcionar després de modificar el directori :-/ TODO: Resolver esta
+cuestión, porque no acabo de entender porque ha dejado de funcionar. (DONE)
+
+NOTE: Mare meva! en posar "pause" apareix el codi! xD què fort!
 
 ## Incloure SDL... i printf deixa de funcionar!
 

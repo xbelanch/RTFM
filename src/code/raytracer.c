@@ -46,7 +46,7 @@ Color getColor(Ray* ray, Scene* scene, int depth)
               col.b * attenuation.b
               };
         } else {
-        return (Color) {0.0, 0.0, 0.0};
+        return (Color) {1.0, .0, 1.0}; // @note: what happens with those rays that didn't return any color?
       }
     } else {
 
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 
 
   sphere = newSphere( location(.0, .0, -1), .5 );
-  sphere->material = Lambertian((Color) {0.8, 0.3, 0.3});
+  sphere->material = Lambertian((Color) {0.1, 0.2, 0.4});
   scene->add(scene, sphere);
 
   sphere = newSphere( location(.0, -100.5, -1.0), 100 );
@@ -96,17 +96,20 @@ int main(int argc, char** argv)
   scene->add(scene, sphere);
 
   sphere = newSphere( location(1, 0, -1.0), .5 );
-  sphere->material = Metal((Color) {.8, .6, .2}, 0.3);
+  sphere->material = Metal((Color) {.8, .6, .2}, 0.0);
   scene->add(scene, sphere);
 
-  sphere = newSphere( location(-1, 0, -1.0), .5 );
-  sphere->material = Metal((Color) {.8, .8, .8}, 0.95);
+  sphere = newSphere( location(-1, 0, -1.0), 0.5 );
+  sphere->material = Dielectric(1.5);
   scene->add(scene, sphere);
 
-
-  sphere = newSphere( location(0, 0.85, -1.0), .35 );
-  sphere->material = Lambertian((Color) {0.2, 0.2, .65});
+    sphere = newSphere( location(-1, 0, -1.0), -0.45 );
+  sphere->material = Dielectric(1.5);
   scene->add(scene, sphere);
+
+  /* sphere = newSphere( location(0, 0.85, -1.0), .35 ); */
+  /* sphere->material = Lambertian((Color) {0.2, 0.2, .65}); */
+  /* scene->add(scene, sphere); */
 
 
 

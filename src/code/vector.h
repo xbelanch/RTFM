@@ -77,7 +77,7 @@ inline Vector vectorNegate(Vector a)
   Vector n;
     n.x = -a.x;
     n.y = -a.y;
-    n.x = -a.z;
+    n.z = -a.z;
     return n;
 }
 

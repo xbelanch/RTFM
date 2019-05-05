@@ -46,6 +46,7 @@ typedef struct _material
 {
   Color albedo;
   double fuzz;
+  double ref_idx;
   bool (*scatter) (Ray* ray_in, Ray* scattered, struct _material* self, struct _hit_record rec, Color* attenuation);
 } Material;
 

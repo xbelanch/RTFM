@@ -15,7 +15,7 @@
 #define false 0
 #define hscale 2
 #define wscale 2
-#define samples 2
+#define samples 8
 
 
 
