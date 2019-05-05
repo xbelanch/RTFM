@@ -38,6 +38,8 @@ typedef struct _camera
   Vector horizontal;
   Vector vertical;
   Vector origin;
+  Vector u, v, w;
+  double lens_radius;
   Ray* (*get_ray) (struct _camera* camera, double u, double v);
 } Camera;
 

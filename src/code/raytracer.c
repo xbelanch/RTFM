@@ -118,9 +118,12 @@ int main(int argc, char** argv)
   Vector lookFrom = {-2, 2, 1};
   Vector lookAt = {0, 0, -1};
   Vector Up = {0, 1, 0};
-  double fov = 30;
+  double fov = 20;
   double aspect = (double)(W) / (double)(H);
-  Camera* camera = newCamera(lookFrom, lookAt, Up, fov, aspect);
+  double aperture = 2.0;
+  double dist_to_focus = vectorLength(vectorSubtract(lookFrom, lookAt));
+
+  Camera* camera = newCamera(lookFrom, lookAt, Up, fov, aspect, aperture, dist_to_focus);
 
 
   // Create a basic SDL infrastructure:
