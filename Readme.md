@@ -40,7 +40,7 @@ Hem iniciat l'ordinador i, si bé ha muntat la unitat R: no veiem que tingui cap
 
 Aquest mereix un capítol a banda, ja que té un cert recorregut. Ara mateix, la única cosa que podem fer es afegir dins de Windows una variable d'entorn perquè s'executi des de terminal (tot i que, arran d'això, ha intentat crear, en el moment d'executar-se per primera vegada, un .emacs.d en la carpeta d'usuari).
 
-He trobat a github un tema init.el força configurable: 
+He trobat a github un tema init.el força configurable:
 
 
 
@@ -128,7 +128,7 @@ el `#define SDL_MAIN_HANDLED`. Ara cal veure si funciona el
 debugger amb el MS Visual Studio 2017. I, tachan! funciona!
 :D
 
-Continuem! 
+Continuem!
 
 ## SDL_Quit no funciona ##
 
@@ -136,7 +136,7 @@ En aquests moments, no podem entendre el perquè no funciona
 la interrupció del SDL_QUIT i, per tant, no hi ha manera de
 saber si la entrada de teclat funciona...
 
-Ja està solventat en el moment d'incloure el següent codi:
+DONE: Ja està solventat en el moment d'incloure el següent codi:
 
       // Process events
       for(SDL_Event ev; SDL_PollEvent(&ev) != 0; )
@@ -152,10 +152,11 @@ Ja està solventat en el moment d'incloure el següent codi:
               }
             }
 
-        } 
+        }
 
 
-## Compile des de Emacs 
+
+## Compile des de Emacs
 
 M-x compile i li diem Build perque cridi el batch que hem creat a propòsit. El
 problema immediat és que no reconeix el compilador de MS (cl is not found o
@@ -166,7 +167,7 @@ TODO: Cal revisar de nou la web de Muratori al respecte: [Shell
 Bat](https://github.com/ecxr/handmadehero/blob/master/misc/shell.bat). Després
 de veure com ho fa, trobaràs que ha fet el següent: adjuntar aquest argument
 
-    /k r:/shell.bat 
+    /k r:/shell.bat
 
 en el paràmetre de executar el cmd.
 
@@ -202,16 +203,15 @@ poden trobar-se en escena. Bàsicament, el que farem en llista de todo, serà el
 següent:
 
 * TODO: Crear un fitxer struct.h amb la definició de les estructures del Ray Tracing
-* TODO: Reescriure el vectors.h perquè les operacions siguin macros 
+* TODO: Reescriure el vectors.h perquè les operacions siguin macros
+
+Todo lo anterior se realizó y se ha logrado los primeros renders que cumplen casi perfectamente con el ray tracer básico del libro. 
+
+TODO: Ahora que funciona, sí que es necesario reescribir el código, ya que este no compila con el GCC de Cygwin. Hay errores
 
 
+## Compilació Cygwin!
 
+Atenció, que vienen curvas! Abre el fichero Makefile que encontrarás en src/code
 
-
-
-
-
-
-
-
-
+Por otro lado, para que pueda funcionar el exe, necesitas instalar cygSDL2-2-0-0.dll y cygwin1.dll en el mismo directorio que el exe.

@@ -58,14 +58,12 @@ typedef struct _hit_record
   Vector p;
   Vector normal;
   Material* material;
-
-
 } hit_record;
 
 
 typedef struct _anObject
 {
-  struct _anObject* next;
+  //struct _anObject* next;
   ObjectType type;
   Material* material;
 

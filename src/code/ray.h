@@ -1,35 +1,19 @@
 #ifndef RAYH
-#define RAYH
+#define RAYH 1
 
+#include "vector.h"
+#include "camera.h"
 
-Vector point_at_parameter(struct _ray* ray, double t)
+typedef struct _ray
 {
-  Vector v =
-  {
-    ray->origin.x + (ray->direction.x * t),
-    ray->origin.y + (ray->direction.y * t),
-    ray->origin.z + (ray->direction.z * t)
-  };
+  Point3 origin;
+  v3 direction;
+  /* Point3 (*point_at_parameter)(struct _ray*, double); */
+  /* void (*getDirection)(struct _ray*, struct _camera*, double, double); */
+} Ray;
 
-  return v;
-}
-
-Ray* newRay(Vector o, Vector direction)
-{
-  Ray* ray = malloc(sizeof(Ray));
-  if (ray != NULL)
-    {
-      ray->origin = o;
-      ray->direction = direction;
-
-      return ray;
-    }
-
-  return NULL;
-};
-
-
-
-
-
-#endif RAYH
+Ray* newRay(Point3, v3);
+Point3 point_at_parameter(Ray* ray, double t);
+void getDirection(Ray* ray, Camera* camera, double u, double v);
+void getRayfromCamera(Ray* ray, Camera* camera, double s, double t);
+#endif
