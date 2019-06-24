@@ -10,9 +10,37 @@
 #include "texture.h"
 #include "trace.h"
 
-void createPPM(FILE* file, int r, int g, int b)
+Buffer* newBuffer(int width, int height)
 {
-  fprintf(file, "%d %d %d\n", r, g, b);
+  Buffer* buffer = malloc(sizeof(Buffer) * width * height);
+  if (buffer != NULL)
+    {
+      int i;
+      for (i = 0; i < width * height; i++)
+        {
+          buffer[i].red = 0; buffer[i].green = 0; buffer[i].blue = 0;
+        }
+
+      return buffer;
+    }
+  else {
+    return NULL;
+  }
+}
+
+void createPPM(FILE* file, Buffer* buffer, int width, int height)
+{
+  int r, g, b;
+  for (int j = height - 1; j >= 0; j--)
+    {
+      for (int i = 0; i < width; i++)
+        {
+          r = buffer[j * width + i].red;
+          g = buffer[j * width + i].green;
+          b = buffer[j * width + i].blue;
+          fprintf(file, "%d %d %d\n", r, g, b);
+        }
+    }
 }
 
 
@@ -83,6 +111,6 @@ Hitable* random_scene()
   scene->addObject(scene, newSphere(v3New(.0, 1.0, .0), 1.0, Dielectric(1.5)));
   scene->addObject(scene, newSphere(v3New(4.0, 1.0, .0), 1.0, Metal((Color){.7, .6, .5}, .0)));
   // print scene info
-  scene->log(scene);
+  //  scene->log(scene);
   return scene;
 }

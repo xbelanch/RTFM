@@ -24,6 +24,17 @@
 #include "material.h"
 #include "trace.h"
 
+/* TODO, FIXME, ALERT
+
+   TODO: Create a simple parser for the scene instead of hardcoding
+   TODO: Rewrite trace.h to include a struct to handle with global variables like Ray, Color and ir, ig, ib
+   TODO: Implement a png write?
+   TODO: matrix.h
+   TODO:
+   FIXME: vector.h Dont like some operations like add, sub and others :-
+   FIXME: material.c Seems that rand48() in random_in_unit_sphere() compile with Visual Studio is a mess
+*/
+
 
 int main(int argc, char** argv)
 {
@@ -34,11 +45,13 @@ int main(int argc, char** argv)
     printf("Pass arguments is not supported on this version\n");
 
   // Trace initialization
-  Canvas canvas = {400, 200};
-   // Create the ppm file */
+  int width = 800;
+  int height = 200;
+
+  // Create the ppm file */
   FILE* ppm;
   ppm = fopen("../../renders/picture.ppm", "w+");
-  fprintf(ppm, "P3\n%d %d\n255\n", canvas.width, canvas.height);
+  fprintf(ppm, "P3\n%d %d\n255\n", width, height);
 
   int samples = 32;
   // Scene creation
@@ -49,7 +62,7 @@ int main(int argc, char** argv)
                              (v3){.0, .0, 0},   // look At
                              (v3){0.0, 1.0, 0.0 }, // Up vector
                              20, // fov
-                             (double)(canvas.width)/(double)(canvas.height), // aspect ratio
+                             (double)(width)/(double)(height), // aspect ratio
                              1.0, // aperture
                              v3Length((v3){13.0, 2.0, 3.0})// dist_to_focus
                              );
@@ -58,17 +71,22 @@ int main(int argc, char** argv)
   Ray ray;
   Color color;
   int ir, ig, ib;
+  // initialize the picture buffer
+  Buffer* buffer = newBuffer(width,  height);
+
+
   // paint the canvas
-  for (int j = canvas.height; j >= 0; j--)
+  printf("Render process...\n");
+  for (int j = height-1; j >= 0; j--)
     {
-      for (int i = 0; i < canvas.width ; i++)
+      for (int i = 0; i < width ; i++)
         {
           // antialiasing
           color.r = color.g = color.b = 0.0;
           for (int s = 0; s < samples; s++)
             {
-              double u = (double)(i + drand48()) / (double)(canvas.width);
-              double v = (double)(j + drand48()) / (double)(canvas.height);
+              double u = (double)(i + drand48()) / (double)(width);
+              double v = (double)(j + drand48()) / (double)(height);
 
               // calculate ray direction
               getRayfromCamera(&ray, camera, u, v);
@@ -89,10 +107,17 @@ int main(int argc, char** argv)
           ig = (int)(255.99 * color.g);
           ib = (int)(255.99 * color.b);
 
-          // save color to ppm file */
-          createPPM(ppm, ir, ig, ib);
+          // store color to the buffer
+          buffer[j * width + i].red = ir;
+          buffer[j * width + i].green = ig;
+          buffer[j * width + i].blue = ib;
+
         }
     }
+  // save color to ppm file */
+  printf("Save render to a PPM\n");
+  createPPM(ppm, buffer, width, height);
+  free(buffer);
 
   return 0;
 }

@@ -26,10 +26,9 @@ typedef bool flag;
 #define _XOPEN_SOURCE    /* ALWAYS BEFORE the include statement */
 #if defined _WIN32
 // https://docs.microsoft.com/en-us/previous-versions/sxtz2fa8(v=vs.140)
-#define _CRT_RAND_S
 // drand48() returns a random double in the range [0.0, 1.0). You can mimic with rand() by the expression (rand() / (RAND_MAX + 1.0)).
-
-#define drand48() (rand() / (RAND_MAX + 1.0))
+#define srand48(x) srand((int)(x))
+#define drand48() ((double)rand()/(double)RAND_MAX)
 #endif
 
 

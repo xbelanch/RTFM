@@ -7,13 +7,14 @@
 #include "color.h"
 #include "hitable.h"
 
-typedef struct _canvas
-{
-  int width;
-  int height;
-} Canvas;
 
-void createPPM(FILE* file, int r, int g, int b);
+typedef struct _buffer
+{
+  int red; int green; int blue;
+} Buffer;
+
+Buffer* newBuffer(int width, int height);
+void createPPM(FILE* file, Buffer* buffer, int width, int height);
 Color getColor(Ray* ray, Hitable* scene, int depth);
 Hitable* random_scene();
 

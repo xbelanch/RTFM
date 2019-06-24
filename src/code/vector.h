@@ -21,7 +21,8 @@ typedef v3 Point3;
 // v3 operations
 extern double v3SquaredLength(), v3Length();
 extern double v3Dot(), v3DistanceBetween2Points();
-extern v3* v3Negate(),* v3Normalize(),* v3Scale(),* v3Add(),* v3Sub();
+extern void v3Normalize(), v3Scale();
+extern v3* v3Negate(),* v3Add(),* v3Sub();
 extern v3* v3Mul(),* v3Cross();
 extern v3* v3New();
 extern v3* v3Duplicate();

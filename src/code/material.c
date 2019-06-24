@@ -1,8 +1,9 @@
-/* TODO:
+/* NOTE:
    must split in files for every material: lambertian.c, metal.c, dielectric.c...
 */
 #define _XOPEN_SOURCE    /* ALWAYS BEFORE the include statement */
 // https://cs50.stackexchange.com/questions/6061/implicit-declaration-of-function-drand48-is-invalid-in-c99-generating-rand
+#define _CRT_RAND_S
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,11 +20,13 @@
 v3 random_in_unit_sphere()
 {
   v3 p;
+  double t;
   do {
     p.x = 2.0 * drand48() - 1.0;
     p.y = 2.0 * drand48() - 1.0;
     p.z = 2.0 * drand48() - 1.0;
-  } while (v3SquaredLength(&p) >= 1.0);
+    t = v3SquaredLength(p);
+  } while (t >= 1.0);
   return p;
 }
 

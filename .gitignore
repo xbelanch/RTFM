@@ -54,6 +54,10 @@ src/build/
 *.idb
 *.pdb
 
+# Dump
+*.stackdump
+*.exe.stackdump
+
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~
