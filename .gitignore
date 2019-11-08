@@ -9,6 +9,8 @@ docs/*
 GPATH
 *TAGS*
 src/dep/
+docs/
+renders/*.png
 
 ## Avoid ppm files! 
 *.ppm
