@@ -1,10 +1,14 @@
-
 # Created by https://www.gitignore.io/api/c,emacs
 # Edit at https://www.gitignore.io/?templates=c,emacs
+
 
 ### Custom ###
 
 src/build/
+docs/*
+GPATH
+*TAGS*
+src/dep/
 
 ## Avoid ppm files! 
 *.ppm

@@ -1,4 +1,4 @@
-# Raytracer for the masses (again?)
+# Ray Tracing For the Masses! (RTFM)
 
 Un Raytracer com a exucsa per treballar diferents qüestions que apariexen a handmade hero i per després compartir-lo amb la petitona i els petis ;)
 
@@ -41,8 +41,6 @@ Hem iniciat l'ordinador i, si bé ha muntat la unitat R: no veiem que tingui cap
 Aquest mereix un capítol a banda, ja que té un cert recorregut. Ara mateix, la única cosa que podem fer es afegir dins de Windows una variable d'entorn perquè s'executi des de terminal (tot i que, arran d'això, ha intentat crear, en el moment d'executar-se per primera vegada, un .emacs.d en la carpeta d'usuari).
 
 He trobat a github un tema init.el força configurable:
-
-
 
 
 ## Creació del primer codi file
