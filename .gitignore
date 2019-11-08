@@ -8,9 +8,10 @@ src/build/
 docs/*
 GPATH
 *TAGS*
-src/dep/
+src/dep/*
+renders/
 docs/
-renders/*.png
+.vs/
 
 ## Avoid ppm files! 
 *.ppm
